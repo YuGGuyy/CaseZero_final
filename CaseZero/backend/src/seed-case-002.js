@@ -15,9 +15,14 @@
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import { Case, Evidence, Clue, Puzzle, Node } from './models/index.js';
+import { connectDB } from './db.js';
 
 // ─── Connect ────────────────────────────────────────────────────────────────
-await mongoose.connect(process.env.MONGO_URI);
+const connected = await connectDB(process.env.MONGO_URI);
+if (!connected) {
+  console.error('✖ Could not connect to MongoDB. Aborting.');
+  process.exit(1);
+}
 console.log('✔ Connected to MongoDB');
 
 // ─── Locate existing CZ-002 Case (created by the original seed) ─────────────

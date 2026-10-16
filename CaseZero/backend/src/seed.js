@@ -2,8 +2,13 @@ import 'dotenv/config';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { User, Case, Evidence, Clue, Puzzle, Node } from './models/index.js';
+import { connectDB } from './db.js';
 
-await mongoose.connect(process.env.MONGO_URI);
+const connected = await connectDB(process.env.MONGO_URI);
+if (!connected) {
+  console.error('[Seed] Database connection failed. Aborting seed.');
+  process.exit(1);
+}
 await Promise.all([User, Case, Evidence, Clue, Puzzle, Node].map(m => m.deleteMany({})));
 
 // Seed Default Users

@@ -1,4 +1,11 @@
-import io from 'socket.io-client';
+let io;
+try {
+  const mod = await import('socket.io-client');
+  io = mod.default || mod.io || mod;
+} catch {
+  const mod = await import('../../frontend/node_modules/socket.io-client/build/esm/index.js');
+  io = mod.io || mod.default || mod;
+}
 
 const API_BASE = 'http://localhost:5000/api';
 const SOCKET_BASE = 'http://localhost:5000';

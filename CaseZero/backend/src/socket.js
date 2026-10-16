@@ -1,16 +1,23 @@
 import { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { User, Investigation } from './models/index.js';
+import { isOriginAllowed } from './app.js';
 
 let io = null;
 
 // Track active sockets per room: investigationId -> Map(socketId -> { user, action })
 const roomSockets = new Map();
 
-export function initSocket(server, clientUrl) {
+export function initSocket(server) {
   io = new Server(server, {
     cors: {
-      origin: clientUrl || '*',
+      origin: (origin, callback) => {
+        if (isOriginAllowed(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error(`Origin ${origin} not allowed by Socket.IO CORS`));
+        }
+      },
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
       credentials: true
     }
