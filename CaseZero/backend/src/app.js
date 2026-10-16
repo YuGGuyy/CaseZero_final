@@ -67,6 +67,16 @@ app.get(['/health', '/api/health'], (req, res) => {
   });
 });
 
+// Database readiness guard for API routes (fast-fail instead of hanging query buffers)
+app.use('/api', (req, res, next) => {
+  if (req.path === '/health' || isDbConnected()) {
+    return next();
+  }
+  return res.status(503).json({
+    error: 'Database connection is currently unavailable. Please verify MongoDB Atlas cluster and Network Access settings.'
+  });
+});
+
 app.use('/api/auth', auth);
 app.use('/api/cases', cases);
 app.use('/api/investigations', inv);
